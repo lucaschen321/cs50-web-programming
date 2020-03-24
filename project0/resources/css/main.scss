@@ -1,0 +1,122 @@
+.navbar {
+    margin-bottom: 1rem;
+}
+
+//
+// Home
+//
+#card-profile {
+    z-index: 1;
+    position: absolute;
+    background-color: white;
+    margin: auto;
+    display: block;
+    color: black;
+    font-weight: bold;
+
+    @media only screen and (max-width: 768px) {
+        width: 70%;
+        height: 80%;
+        left: 15%;
+        right: 15%;
+        top: 10%;
+        padding: 1rem;
+        display: none;
+    }
+
+    @media only screen and (min-width: 768px) {
+        width: 50%;
+        height: 70%;
+        left: 20%;
+        right: 20%;
+        top: 10%;
+        padding: 1rem;
+    }
+
+    @media only screen and (min-width: 1200px) {
+        width: 35%;
+        height: 60%;
+        left: 30%;
+        right: 30%;
+        top: 20%;
+        padding: 2rem;
+    }
+}
+
+#img-profile {
+    position:relative;
+    
+    border-radius: 50%;
+    border: 1px dotted #d8d8d8;
+    @media only screen and (max-width: 768px) {
+        width: 20%;
+    }
+    @media only screen and (min-width: 768px) {
+        width: 30%;
+    }
+    @media only screen and (min-width: 1200px) {
+        width: 30%;
+    }
+
+}
+
+#img-profile-mobile {
+    position:absolute;
+    
+    border-radius: 50%;
+    border: 1px dotted #d8d8d8;
+    z-index: 1;
+    width: 20%;
+    left: 40%;
+    right: 40%;
+    top: 20%;
+    
+    @media only screen and (min-width: 768px) {
+        display: none;
+
+    }
+}
+
+.center-image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.list-group {
+    cursor: pointer;
+
+    @media only screen and (max-width: 768px) {
+        height: 400px;
+    }
+
+    @media only screen and (min-width: 768px) {
+        height: 300px;
+    }
+
+    .list-group-item-panel {
+        @media only screen and (max-width: 768px) {
+            height: 400px;
+        }
+        @media only screen and (min-width: 768px) {
+            height: 300px;
+        }
+
+        font-size: 3rem;
+        background-size: cover !important;
+        border: none;
+        text-align: center;
+        color: black;
+        padding-top: 8%;
+        padding-bottom:8%;
+        text-shadow: 1px 1px 2px white;
+    }
+
+    .list-group-item-panel:hover{
+        opacity: 0.7;
+    }
+}
+
+//
+// Chinese
+//
