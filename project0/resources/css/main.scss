@@ -2,6 +2,10 @@
     margin-bottom: 1rem;
 }
 
+.center-text {
+    text-align: center;
+}
+
 //
 // Home
 //
@@ -76,11 +80,13 @@
 
     }
 }
-
-.center-image {
+%center-image {
     display: block;
     margin-left: auto;
-    margin-right: auto;
+    margin-right: auto; 
+}
+.center-image  {
+    @extend %center-image;
 }
 
 .list-group {
@@ -120,3 +126,31 @@
 //
 // Chinese
 //
+
+//
+// Classical Music
+// 
+
+#table-classical-recordings {
+    @extend %center-image;
+    @media only screen and (max-width: 600px) {
+        font-size: 3vw; 
+     
+    }
+
+    table {
+        tbody {
+            tr {
+                th {
+                    img {
+                        @extend %center-image;
+                        width: 60%;
+                        height: auto;
+                        display: block;
+                    }
+                    text-align: center;
+                }
+            }
+        }
+    }
+}

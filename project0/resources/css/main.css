@@ -1,6 +1,9 @@
 .navbar {
   margin-bottom: 1rem; }
 
+.center-text {
+  text-align: center; }
+
 #card-profile {
   z-index: 1;
   position: absolute;
@@ -62,7 +65,7 @@
     #img-profile-mobile {
       display: none; } }
 
-.center-image {
+.center-image, #table-classical-recordings, #table-classical-recordings table tbody tr th img {
   display: block;
   margin-left: auto;
   margin-right: auto; }
@@ -92,5 +95,15 @@
         height: 300px; } }
   .list-group .list-group-item-panel:hover {
     opacity: 0.7; }
+
+@media only screen and (max-width: 600px) {
+  #table-classical-recordings {
+    font-size: 3vw; } }
+#table-classical-recordings table tbody tr th {
+  text-align: center; }
+  #table-classical-recordings table tbody tr th img {
+    width: 60%;
+    height: auto;
+    display: block; }
 
 /*# sourceMappingURL=main.css.map */
