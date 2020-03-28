@@ -4,6 +4,14 @@
 .center-text {
   text-align: center; }
 
+body {
+  font-family: 'Avenir Next',Helvetica,sans-serif; }
+
+blockquote {
+  margin: 1rem 0;
+  padding-left: 1.4rem;
+  border-left: 4px solid #dadada; }
+
 #card-profile {
   z-index: 1;
   position: absolute;
