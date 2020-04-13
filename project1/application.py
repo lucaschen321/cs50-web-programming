@@ -32,18 +32,68 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # Handle logouts
     if request.method == "POST":
-        # TODO: Handle searches
         try:
-            if request.form.get("action") == "logout":
-                session["user_id"] = request.form.get("username")
+            # Handle logouts
+            if "logout" in request.form:
+                session["user_id"] = None
             else:
                 raise Exception
         except:
             return render_template("error.html")
 
     return render_template("index.html")
+
+
+@app.route("/search", methods=["POST"])
+def search():
+    search_text = request.form.get("search_text")
+    search_results = []
+
+    if request.method == "POST":
+        try:
+            if "search" in request.form:
+                if request.form.get("search_type") == "title":
+                    search_results = db.execute(
+                        "SELECT *, similarity(books.title, :search_text) AS similarity FROM books WHERE books.title % :search_text ORDER BY similarity DESC",
+                        {"search_text": search_text},
+                    ).fetchall()
+                elif request.form.get("search_type") == "author":
+                    search_results = db.execute(
+                        "SELECT *, similarity(books.author, :search_text) AS similarity FROM books WHERE books.author % :search_text ORDER BY similarity DESC",
+                        {"search_text": search_text},
+                    ).fetchall()
+                elif request.form.get("search_type") == "isbn":
+                    search_results = db.execute(
+                        "SELECT *, similarity(books.isbn, :search_text) AS similarity FROM books WHERE books.isbn % :search_text ORDER BY similarity DESC",
+                        {"search_text": search_text},
+                    ).fetchall()
+                else:
+                    raise Exception
+        except:
+            return render_template("error.html")
+
+    return render_template(
+        "search.html", search_text=search_text, search_results=search_results
+    )
+
+
+@app.route("/book/<int:bookid>-<string:title>")
+def book(bookid, title):
+    """List details about a single book."""
+
+    # Make sure book exists.
+    book = db.execute(
+        "SELECT * from books WHERE bookid = :bookid", {"bookid": bookid}
+    ).fetchone()
+    if book is None:
+        return render_template("error.html")
+
+    # Get all reviews.
+    reviews = db.execute(
+        "SELECT * FROM reviews WHERE bookid = :bookid", {"bookid": bookid}
+    ).fetchall()
+    return render_template("book.html", book=book, reviews=reviews)
 
 
 @app.route("/register", methods=["GET", "POST"])
