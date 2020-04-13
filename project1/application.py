@@ -1,5 +1,6 @@
 import datetime
 import os
+import requests
 
 from flask import (
     Flask,
@@ -10,10 +11,13 @@ from flask import (
     request,
     session,
     url_for,
+    jsonify,
 )
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+
+API_KEY = "Z7R70Aa7CUV7sRjqhHVrTg"
 
 app = Flask(__name__)
 
@@ -93,20 +97,41 @@ def book(bookid, title):
     # Submit review if posted
     if request.method == "POST":
         rating_text = request.form.get("rating_text")
-        rating_num = request.form.get('rating_num')
+        rating_num = request.form.get("rating_num")
 
         if not "rating_text" in request.form:
             flash("Please submit a review", "error")
         else:
-            user_id = db.execute("SELECT * FROM users WHERE username = :username", {"username": session["user_id"]}).fetchone().userid
+            user_id = (
+                db.execute(
+                    "SELECT * FROM users WHERE username = :username",
+                    {"username": session["user_id"]},
+                )
+                .fetchone()
+                .userid
+            )
 
-            if db.execute("SELECT * FROM reviews WHERE userid = :userid AND bookid = :bookid", {"userid": user_id, "bookid": bookid}).rowcount > 0:
+            if (
+                db.execute(
+                    "SELECT * FROM reviews WHERE userid = :userid AND bookid = :bookid",
+                    {"userid": user_id, "bookid": bookid},
+                ).rowcount
+                > 0
+            ):
                 # User already submitted a review
-               flash("Already submitted a review", "error") 
+                flash("Already submitted a review", "error")
             else:
                 db.execute(
                     "INSERT INTO reviews (userid, bookid, rating_num, rating_text, time_created) VALUES (:userid, :bookid, :rating_num, :rating_text, :time_created)",
-                    {"userid": user_id, "bookid": book.bookid, "rating_num": rating_num, "rating_text": rating_text, "time_created": datetime.datetime.now().strftime('%Y-%m-%d %H:%M')},
+                    {
+                        "userid": user_id,
+                        "bookid": book.bookid,
+                        "rating_num": rating_num,
+                        "rating_text": rating_text,
+                        "time_created": datetime.datetime.now().strftime(
+                            "%Y-%m-%d %H:%M"
+                        ),
+                    },
                 )
                 db.commit()
 
@@ -115,7 +140,24 @@ def book(bookid, title):
         "SELECT * FROM reviews WHERE bookid = :bookid", {"bookid": bookid}
     ).fetchall()
 
-    return render_template("book.html", book=book, reviews=reviews)
+    # Get Goodreads review data
+    request_json = requests.get(
+        "https://www.goodreads.com/book/review_counts.json",
+        params={"key": API_KEY, "isbns": book.isbn},
+    ).json()
+    goodreads_data = {}
+    # Handle cases with no matches or wrong matches
+    if request_json["books"] and request_json["books"][0]:
+        if (
+            request_json["books"][0]["isbn"] == book.isbn
+            or request_json["books"][0]["isbn13"] == book.isbn
+        ):
+            # goodreads_data = request_json['books'][0]
+            pass
+
+    return render_template(
+        "book.html", book=book, reviews=reviews, goodreads_data=goodreads_data
+    )
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -160,6 +202,7 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Login to account"""
+
     error = None
     username = request.form.get("username")
     password = request.form.get("password")
@@ -182,3 +225,7 @@ def login():
             return redirect(url_for("index"))
 
     return render_template("login.html")
+
+
+
+

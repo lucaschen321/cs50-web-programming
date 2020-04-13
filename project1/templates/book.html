@@ -12,6 +12,11 @@
   <li>ISBN: {{ book.isbn }}</li>
   <li>Publication Year: {{ book.publication_year }}</li>
 </ul>
+<h2>Goodreads Data</h2>
+<ul>
+  <li>Average Rating: {{ goodreads_data['average_rating'] | default("N/A") }} </li>
+  <li>Number of reviews: {{ goodreads_data['work_ratings_count'] | default("N/A") }} </li>
+</ul>
 
 <form action="{{ url_for('book', bookid=book.bookid, title=book.title) }}" method="post">
 
@@ -44,7 +49,7 @@
       <li>Review: {{ review.rating_text }}</li>
     </ul>
   {% else %}
-    <h2>No reviews.</h2>
+    <h2>No reviews</h2>
   {% endfor %}
 
 
