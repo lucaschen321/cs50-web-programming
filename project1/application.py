@@ -227,5 +227,25 @@ def login():
     return render_template("login.html")
 
 
+@app.route("/api/<string:isbn>", methods=["GET"])
+def api(isbn):
+    """Handle API requests"""
 
+    book = db.execute(
+        "SELECT title, author, isbn, publication_year, COUNT(*), AVG(reviews.rating_num) from books LEFT JOIN reviews ON books.bookid = reviews.bookid WHERE isbn = :isbn GROUP BY books.bookid;",
+        {"isbn": isbn},
+    ).fetchone()
+    # Make sure book with ISBN exists in database
+    if not book:
+        return jsonify({"error": "Requested ISBN not in database"}), 404
 
+    return jsonify(
+        {
+            "title": book.title,
+            "author": book.author,
+            "year": book.publication_year,
+            "isbn": book.isbn,
+            "review_count": 0 if not book.avg else book.count,
+            "average_score": book.avg,
+        }
+    )
