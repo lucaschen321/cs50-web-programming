@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from flask import (
@@ -78,9 +79,9 @@ def search():
     )
 
 
-@app.route("/book/<int:bookid>-<string:title>")
+@app.route("/book/<int:bookid>-<string:title>", methods=["GET", "POST"])
 def book(bookid, title):
-    """List details about a single book."""
+    """List details about a single book and accept review submissions."""
 
     # Make sure book exists.
     book = db.execute(
@@ -89,10 +90,31 @@ def book(bookid, title):
     if book is None:
         return render_template("error.html")
 
+    # Submit review if posted
+    if request.method == "POST":
+        rating_text = request.form.get("rating_text")
+        rating_num = request.form.get('rating_num')
+
+        if not "rating_text" in request.form:
+            flash("Please submit a review", "error")
+        else:
+            user_id = db.execute("SELECT * FROM users WHERE username = :username", {"username": session["user_id"]}).fetchone().userid
+
+            if db.execute("SELECT * FROM reviews WHERE userid = :userid AND bookid = :bookid", {"userid": user_id, "bookid": bookid}).rowcount > 0:
+                # User already submitted a review
+               flash("Already submitted a review", "error") 
+            else:
+                db.execute(
+                    "INSERT INTO reviews (userid, bookid, rating_num, rating_text, time_created) VALUES (:userid, :bookid, :rating_num, :rating_text, :time_created)",
+                    {"userid": user_id, "bookid": book.bookid, "rating_num": rating_num, "rating_text": rating_text, "time_created": datetime.datetime.now().strftime('%Y-%m-%d %H:%M')},
+                )
+                db.commit()
+
     # Get all reviews.
     reviews = db.execute(
         "SELECT * FROM reviews WHERE bookid = :bookid", {"bookid": bookid}
     ).fetchall()
+
     return render_template("book.html", book=book, reviews=reviews)
 
 
