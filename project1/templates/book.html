@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+  Book
+{% endblock %}
+
+{% block body %}
+<h1>Book</h1>
+<ul>
+  <li>Title: {{ book.title }} </li>
+  <li>Author: {{ book.author }}</li>
+  <li>ISBN: {{ book.isbn }}</li>
+  <li>Publication Year: {{ book.publication_year }}</li>
+</ul>
+
+<h1>Reviews</h1>
+<ul>
+  {% for review in reviews%}
+    <li>Author: {{ rating.userid}}</li>
+    <li>Review: {{ rating.rating_text}}</li>
+  {% else %}
+    <li>No reviews.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}
