@@ -83,23 +83,23 @@ def search():
     )
 
 
-@app.route("/book/<int:bookid>-<string:title>", methods=["GET", "POST"])
-def book(bookid, title):
+@app.route("/book/<int:book_id>-<string:title>", methods=["GET", "POST"])
+def book(book_id, title):
     """List details about a single book and accept review submissions."""
 
     # Make sure book exists.
     book = db.execute(
-        "SELECT * from books WHERE bookid = :bookid", {"bookid": bookid}
+        "SELECT * from books WHERE book_id = :book_id", {"book_id": book_id}
     ).fetchone()
     if book is None:
         return render_template("error.html")
 
     # Submit review if posted
     if request.method == "POST":
-        rating_text = request.form.get("rating_text")
-        rating_num = request.form.get("rating_num")
+        review_text = request.form.get("review_text")
+        review_rating = request.form.get("review_rating")
 
-        if not "rating_text" in request.form:
+        if not "review_text" in request.form:
             flash("Please submit a review", "error")
         else:
             user_id = (
@@ -108,13 +108,13 @@ def book(bookid, title):
                     {"username": session["user_id"]},
                 )
                 .fetchone()
-                .userid
+                .user_id
             )
 
             if (
                 db.execute(
-                    "SELECT * FROM reviews WHERE userid = :userid AND bookid = :bookid",
-                    {"userid": user_id, "bookid": bookid},
+                    "SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id",
+                    {"user_id": user_id, "book_id": book_id},
                 ).rowcount
                 > 0
             ):
@@ -122,12 +122,12 @@ def book(bookid, title):
                 flash("Already submitted a review", "error")
             else:
                 db.execute(
-                    "INSERT INTO reviews (userid, bookid, rating_num, rating_text, time_created) VALUES (:userid, :bookid, :rating_num, :rating_text, :time_created)",
+                    "INSERT INTO reviews (user_id, book_id, review_rating, review_text, time_created) VALUES (:user_id, :book_id, :review_rating, :review_text, :time_created)",
                     {
-                        "userid": user_id,
-                        "bookid": book.bookid,
-                        "rating_num": rating_num,
-                        "rating_text": rating_text,
+                        "user_id": user_id,
+                        "book_id": book.book_id,
+                        "review_rating": review_rating,
+                        "review_text": review_text,
                         "time_created": datetime.datetime.now().strftime(
                             "%Y-%m-%d %H:%M"
                         ),
@@ -137,7 +137,7 @@ def book(bookid, title):
 
     # Get all reviews.
     reviews = db.execute(
-        "SELECT * FROM reviews WHERE bookid = :bookid", {"bookid": bookid}
+        "SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book_id}
     ).fetchall()
 
     # Get Goodreads review data
@@ -146,7 +146,8 @@ def book(bookid, title):
         params={"key": API_KEY, "isbns": book.isbn},
     ).json()
     goodreads_data = {}
-    # Handle cases with no matches or wrong matches
+    # Handle cases with no matches or wrong matches:235
+
     if request_json["books"] and request_json["books"][0]:
         if (
             request_json["books"][0]["isbn"] == book.isbn
@@ -232,7 +233,7 @@ def api(isbn):
     """Handle API requests"""
 
     book = db.execute(
-        "SELECT title, author, isbn, publication_year, COUNT(*), AVG(reviews.rating_num) from books LEFT JOIN reviews ON books.bookid = reviews.bookid WHERE isbn = :isbn GROUP BY books.bookid;",
+        "SELECT title, author, isbn, publication_year, COUNT(*), AVG(reviews.review_rating) from books LEFT JOIN reviews ON books.book_id = reviews.book_id WHERE isbn = :isbn GROUP BY books.book_id;",
         {"isbn": isbn},
     ).fetchone()
     # Make sure book with ISBN exists in database

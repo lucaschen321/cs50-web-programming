@@ -10,7 +10,7 @@
     <h6>{{ search_results|length }} results for: {{ search_text}}</h6>
         {% for result in search_results %}
             <ul>
-                <li><a href="/book/{{result.bookid}}-{{result.title}}">{{ result.title }}</a></li>
+                <li><a href="/book/{{result.book_id}}-{{result.title}}">{{ result.title }}</a></li>
                 <ul>
                     <li>Author: {{ result.author }}</li>
                     <li>ISBN: {{ result.isbn }}</li>

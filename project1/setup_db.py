@@ -17,26 +17,26 @@ def main():
         """CREATE EXTENSION IF NOT EXISTS PG_TRGM;""",
         # Set up tables
         """CREATE TABLE users (
-            userid BIGSERIAL PRIMARY KEY,
+            user_id BIGSERIAL PRIMARY KEY,
             username VARCHAR NOT NULL,
             password VARCHAR NOT NULL)""",
         """CREATE TABLE books (
-            bookid BIGSERIAL PRIMARY KEY,
+            book_id BIGSERIAL PRIMARY KEY,
             isbn VARCHAR(13) NOT NULL,
             author VARCHAR NOT NULL,title VARCHAR NOT NULL,
             publication_year INTEGER NOT NULL,
             review_count INTEGER NOT NULL)""",
         """CREATE TABLE reviews (
-            reviewid BIGSERIAL PRIMARY KEY,
-            userid BIGINT NOT NULL,
-            FOREIGN KEY ("userid") REFERENCES "users" ("userid") ON DELETE RESTRICT ON UPDATE CASCADE,
-            bookid BIGINT NOT NULL,
-            FOREIGN KEY ("bookid") REFERENCES "books" ("bookid") ON DELETE RESTRICT ON UPDATE CASCADE,
-            rating_num INT NOT NULL,
-            rating_text VARCHAR(10000),
+            review_ id BIGSERIAL PRIMARY KEY,
+            user_id BIGINT NOT NULL,
+            FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE RESTRICT ON UPDATE CASCADE,
+            book_id BIGINT NOT NULL,
+            FOREIGN KEY ("book_id") REFERENCES "books" ("book_id") ON DELETE RESTRICT ON UPDATE CASCADE,
+            review_rating INT NOT NULL,
+            review_text VARCHAR(10000),
             time_created TIMESTAMP NOT NULL,
-            CHECK (rating_num > 0),
-            CHECK (rating_num <= 5))""",
+            CHECK (review_rating > 0),
+            CHECK (review_rating <= 5))""",
     ]
 
     # Execute Commands
