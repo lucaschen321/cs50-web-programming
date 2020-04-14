@@ -16,17 +16,19 @@
     <div class="row">
         <div class="container">
             {% if session['user_id'] %}
-            <form action="{{ url_for('index') }}" method="post">
-              <div class="form-group row" style="float:right;">
-                <label class="col-form-label">Signed in as <b>{{ session['user_id'] }} </label>
-                <div class="container">
-                  <button type="submit" name="action" value="logout" class="btn btn-outline-primary btn-sm" style="margin: 0.25rem auto;">Log Out</button>
+              <!--Display logout button-->
+              <form action="{{ url_for('index') }}" method="post">
+                <div class="form-row" style="float:right;">
+                  <label class="col-form-label form-group">Signed in as <b>{{ session['user_id'] }}</b></label>
+                  <div class="form-group">
+                    <button type="submit" name="logout" class="btn btn-outline-primary btn-sm" style="margin: 0.25rem auto;">Log Out</button>
+                  </div>
                 </div>
-              </div>
-            </form>
-              {% else %}
-              <div class="form-group row" style="float:right;">
-                <div class="container">
+              </form>
+            {% else %}
+            <!--Display login button-->
+              <div class="form-row" style="float:right;">
+                <div class="form-groupr">
                     <a href="/login" class="btn btn-outline-primary btn-sm" role="button" style="margin: 0.25rem auto;">Login</a>
                 </div>
               </div>
