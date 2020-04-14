@@ -101,6 +101,8 @@ def book(book_id, title):
 
         if not "review_text" in request.form:
             flash("Please submit a review", "error")
+        elif not session["user_id"]:
+            flash(Markup('Please <a href="/login" class="alert-link">sign in</a> to submit a review'), "error") 
         else:
             user_id = (
                 db.execute(
@@ -153,8 +155,7 @@ def book(book_id, title):
             request_json["books"][0]["isbn"] == book.isbn
             or request_json["books"][0]["isbn13"] == book.isbn
         ):
-            # goodreads_data = request_json['books'][0]
-            pass
+            goodreads_data = request_json['books'][0]
 
     return render_template(
         "book.html", book=book, reviews=reviews, goodreads_data=goodreads_data
