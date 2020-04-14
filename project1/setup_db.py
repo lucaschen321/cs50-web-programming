@@ -27,7 +27,7 @@ def main():
             publication_year INTEGER NOT NULL,
             review_count INTEGER NOT NULL)""",
         """CREATE TABLE reviews (
-            review_ id BIGSERIAL PRIMARY KEY,
+            review_id BIGSERIAL PRIMARY KEY,
             user_id BIGINT NOT NULL,
             FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE RESTRICT ON UPDATE CASCADE,
             book_id BIGINT NOT NULL,
