@@ -19,7 +19,7 @@ def main():
         """CREATE TABLE users (
             user_id BIGSERIAL PRIMARY KEY,
             username VARCHAR NOT NULL,
-            password VARCHAR NOT NULL)""",
+            password TEXT NOT NULL)""",
         """CREATE TABLE books (
             book_id BIGSERIAL PRIMARY KEY,
             isbn VARCHAR(13) NOT NULL,

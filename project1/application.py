@@ -1,3 +1,4 @@
+import bcrypt
 import datetime
 import os
 import requests
@@ -102,7 +103,12 @@ def book(book_id, title):
         if not "review_text" in request.form:
             flash("Please submit a review", "error")
         elif not session["user_id"]:
-            flash(Markup('Please <a href="/login" class="alert-link">sign in</a> to submit a review'), "error") 
+            flash(
+                Markup(
+                    'Please <a href="/login" class="alert-link">sign in</a> to submit a review'
+                ),
+                "error",
+            )
         else:
             user_id = (
                 db.execute(
@@ -155,7 +161,7 @@ def book(book_id, title):
             request_json["books"][0]["isbn"] == book.isbn
             or request_json["books"][0]["isbn13"] == book.isbn
         ):
-            goodreads_data = request_json['books'][0]
+            goodreads_data = request_json["books"][0]
 
     return render_template(
         "book.html", book=book, reviews=reviews, goodreads_data=goodreads_data
@@ -165,37 +171,43 @@ def book(book_id, title):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register for an account"""
-    error = None
-    username = request.form.get("username")
-    password = request.form.get("password")
-    password_confirmation = request.form.get("password_confirmation")
 
-    # Validate username and passwords and create account
     if request.method == "POST":
-        if not username or not password or not password_confirmation:
+        username = request.form.get("username")
+        password = request.form.get("password")
+        password_confirmation = request.form.get("password_confirmation")
+
+        if (
+            not username or not password or not password_confirmation
+        ):  # Incomplete field(s)
             flash("Please enter username and password", "error")
-        elif password != password_confirmation:
+        elif password != password_confirmation:  # Password mismatch
             flash("Passwords do not match!", "error")
         elif (
             db.execute(
                 "SELECT * FROM users WHERE username = :username", {"username": username}
             ).rowcount
             > 0
-        ):
+        ):  # User already exists
             flash(
                 Markup(
                     'User already exists. Please <a href="/login" class="alert-link">sign in</a>!'
                 ),
                 "error",
             )
-        else:
+        else:  # Register user
+            password = bytes(password, "utf-8")
+            hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
+            hashed_password = hashed_password.decode("utf-8")
             db.execute(
                 "INSERT INTO users (username, password) VALUES (:username, :password)",
-                {"username": username, "password": password},
+                {"username": username, "password": hashed_password},
             )
             db.commit()
+
             session["user_id"] = request.form.get("username")
             flash("Account created!", "message")
+
             return redirect(url_for("index"))
 
     return render_template("register.html")
@@ -205,26 +217,34 @@ def register():
 def login():
     """Login to account"""
 
-    error = None
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    # Validate username and passwords and login to account
     if request.method == "POST":
-        if not username or not password:
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if not username or not password:  # Incomplete field(s)
             flash("Please enter username and password", "error")
-        elif (
-            db.execute(
-                "SELECT * FROM users WHERE username = :username AND password = :password",
-                {"username": username, "password": password},
-            ).rowcount
-            == 0
-        ):
-            flash("Invalid credentials!", "error")
         else:
-            session["user_id"] = request.form.get("username")
-            flash("Logged In!", "message")
-            return redirect(url_for("index"))
+            password = bytes(password, "utf-8")
+            user = db.execute(
+                "SELECT * FROM users WHERE username = :username",
+                {"username": username},
+            ).fetchone()
+
+            if not user:  # User doesn't exist
+                flash(
+                    Markup(
+                        'User does not exist. Please <a href="/register" class="alert-link">register</a> or <a href="/login" class="alert-link">sign in</a> under a different username!'
+                    ),
+                    "error",
+                )
+            elif not bcrypt.checkpw(
+                password, user.password.encode("utf-8")
+            ):  # Invalid credentials
+                flash("Invalid credentials!", "error")
+            else:  # 'Log in' user
+                session["user_id"] = request.form.get("username")
+                flash("Logged In!", "message")
+                return redirect(url_for("index"))
 
     return render_template("login.html")
 
@@ -237,6 +257,7 @@ def api(isbn):
         "SELECT title, author, isbn, publication_year, COUNT(*), AVG(reviews.review_rating) from books LEFT JOIN reviews ON books.book_id = reviews.book_id WHERE isbn = :isbn GROUP BY books.book_id;",
         {"isbn": isbn},
     ).fetchone()
+
     # Make sure book with ISBN exists in database
     if not book:
         return jsonify({"error": "Requested ISBN not in database"}), 404
