@@ -3,3 +3,21 @@
 
 # sass
 *.sass-cache/
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+.pylintrc
+
+# Flask stuff:
+instance/
+*/*_session/
+.webassets-cache
+
+### VisualStudioCode ###
+.vscode/*
+
+# Vim
+[._]*.sw[a-p]
