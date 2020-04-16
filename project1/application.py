@@ -18,8 +18,6 @@ from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-API_KEY = "Z7R70Aa7CUV7sRjqhHVrTg"
-
 app = Flask(__name__)
 
 # Check for environment variable
@@ -34,6 +32,10 @@ Session(app)
 # Set up database
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
+
+# Get Goodreads API key
+with open("GOODREADS_API_KEY", "r") as f:
+    API_KEY = f.read()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -149,13 +151,17 @@ def book(book_id, title):
     ).fetchall()
 
     # Get Goodreads review data
-    request_json = requests.get(
-        "https://www.goodreads.com/book/review_counts.json",
-        params={"key": API_KEY, "isbns": book.isbn},
-    ).json()
-    goodreads_data = {}
-    # Handle cases with no matches or wrong matches:235
+    request_json, goodreads_data = {}, {}
+    try:
+        request_json = requests.get(
+            "https://www.goodreads.com/book/review_counts.json",
+            params={"key": API_KEY, "isbns": book.isbn},
+        ).json()
+    except:
+        # Handle case with invalid API key
+        request_json["books"] = None
 
+    # Handle cases with no matches or wrong matches
     if request_json["books"] and request_json["books"][0]:
         if (
             request_json["books"][0]["isbn"] == book.isbn
