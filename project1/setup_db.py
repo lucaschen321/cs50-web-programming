@@ -18,7 +18,7 @@ def main():
         # Set up tables
         """CREATE TABLE users (
             user_id BIGSERIAL PRIMARY KEY,
-            username VARCHAR NOT NULL,
+            username VARCHAR NOT NULL UNIQUE,
             password TEXT NOT NULL)""",
         """CREATE TABLE books (
             book_id BIGSERIAL PRIMARY KEY,
@@ -30,6 +30,8 @@ def main():
             review_id BIGSERIAL PRIMARY KEY,
             user_id BIGINT NOT NULL,
             FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE RESTRICT ON UPDATE CASCADE,
+            username VARCHAR NOT NULL,
+            FOREIGN KEY ("username") REFERENCES "users" ("username") ON DELETE RESTRICT ON UPDATE CASCADE,
             book_id BIGINT NOT NULL,
             FOREIGN KEY ("book_id") REFERENCES "books" ("book_id") ON DELETE RESTRICT ON UPDATE CASCADE,
             review_rating INT NOT NULL,
