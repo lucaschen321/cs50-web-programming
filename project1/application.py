@@ -56,24 +56,19 @@ def index():
 @app.route("/search", methods=["POST"])
 def search():
     search_text = request.form.get("search_text")
+    search_type = request.form.get("search_type")
     search_results = []
 
     if request.method == "POST":
         try:
             if "search" in request.form:
-                if request.form.get("search_type") == "title":
+                if (
+                    search_type == "title"
+                    or search_type == "author"
+                    or search_type == "isbn"
+                ):
                     search_results = db.execute(
-                        "SELECT *, similarity(books.title, :search_text) AS similarity FROM books WHERE books.title % :search_text ORDER BY similarity DESC",
-                        {"search_text": search_text},
-                    ).fetchall()
-                elif request.form.get("search_type") == "author":
-                    search_results = db.execute(
-                        "SELECT *, similarity(books.author, :search_text) AS similarity FROM books WHERE books.author % :search_text ORDER BY similarity DESC",
-                        {"search_text": search_text},
-                    ).fetchall()
-                elif request.form.get("search_type") == "isbn":
-                    search_results = db.execute(
-                        "SELECT *, similarity(books.isbn, :search_text) AS similarity FROM books WHERE books.isbn % :search_text ORDER BY similarity DESC",
+                        f"SELECT *, similarity(books.{search_type}, :search_text) AS similarity FROM books WHERE books.{search_type} % :search_text ORDER BY similarity DESC",
                         {"search_text": search_text},
                     ).fetchall()
                 else:
@@ -82,7 +77,10 @@ def search():
             return render_template("error.html")
 
     return render_template(
-        "search.html", search_text=search_text, search_results=search_results
+        "search.html",
+        search_text=search_text,
+        search_results=search_results,
+        search_type=search_type,
     )
 
 
