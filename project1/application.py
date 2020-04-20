@@ -51,31 +51,34 @@ def index():
         except:
             return render_template("error.html")
 
-    return render_template("search.html")
+    return render_template("index.html")
 
 
-@app.route("/search", methods=["GET", "POST"])
+@app.route("/search", methods=["GET"])
 def search():
-    search_text = request.form.get("search_text")
-    search_type = request.form.get("search_type")
+    search_type = request.args.get("search_type")
+    search_text = request.args.get("search_text")
     search_results = []
 
-    if request.method == "POST":
-        try:
-            if "search" in request.form:
-                if (
-                    search_type == "title"
-                    or search_type == "author"
-                    or search_type == "isbn"
-                ):
-                    search_results = db.execute(
-                        f"SELECT *, similarity(books.{search_type}, :search_text) AS similarity FROM books WHERE books.{search_type} % :search_text ORDER BY similarity DESC",
-                        {"search_text": search_text},
-                    ).fetchall()
-                else:
-                    raise Exception
-        except:
-            return render_template("error.html")
+    try:
+        if search_type and search_text:
+            if (
+                search_type == "title"
+                or search_type == "author"
+                or search_type == "isbn"
+            ):
+                search_results = db.execute(
+                    f"SELECT *, similarity(books.{search_type}, :search_text) AS similarity FROM books WHERE books.{search_type} % :search_text ORDER BY similarity DESC",
+                    {"search_text": search_text},
+                ).fetchall()
+            else:
+                raise Exception
+        else:
+            # Still redirect to search page if search_type or search_text is empty
+            search_type = "" if not search_type else search_type
+            search_text = "" if not search_text else search_text
+    except:
+        return render_template("error.html"), 404
 
     return render_template(
         "search.html",

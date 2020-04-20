@@ -6,11 +6,11 @@
 
 
 {% block body %}
-    <form action="{{ url_for('search') }}" method="post">
+    <form style="margin-bottom: 1rem;" action="{{ url_for('search') }}" method="get">
         <div class="input-group">
             <input class="form-control" name="search_text" value="{{ search_text }}" >
             <span class="input-group-btn">
-                <button type="submit" name="search" class="btn btn-primary">Search</button>
+                <button type="submit" class="btn btn-primary">Search</button>
            </span>
         </div>
     
@@ -29,6 +29,7 @@
         </div>
     
     </form>
+
 
     <h6>{{ search_results|length }} results for: <b>{{ search_text}}</b></h6>
     {% if search_results %}

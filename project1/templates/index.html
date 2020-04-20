@@ -7,15 +7,15 @@
 {% block body %}
 
 <div class="container" style="margin-top: 20%; margin-bottom: 2%;">
-    <img src="../static/logo.png" style= "min-width: 300px; max-width: 40%; display: block; margin-left: auto; margin-right: auto;" alt="">
+    <img src="../static/logo-full.png" style= "min-width: 300px; max-width: 40%; display: block; margin-left: auto; margin-right: auto;" alt="">
 </div>
 
-<form action="{{ url_for('search') }}" method="post">
+<form action="{{ url_for('search') }}" method="get">
 
     <div class="input-group">
         <input class="form-control" name="search_text" placeholder="Search book by title, author or isbn">
         <span class="input-group-btn">
-            <button type="submit" name="search" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary">Search</button>
        </span>
     </div>
 
