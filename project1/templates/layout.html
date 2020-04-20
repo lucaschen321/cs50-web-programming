@@ -29,18 +29,19 @@
     ></script>
   </head>
   <body>
+
     <!--Navbar-->
     <nav class="navbar navbar-light bg-light" style="margin-bottom: 1rem;">
       <div class="container">
         <a class="navbar-brand" href="/">
           <img src="../static/logo-mini.png" style="height: 50px;" alt="" />
         </a>
-        {% if session['user_id'] %}
+        {% if session["username"] %}
         <!--Display logout button-->
         <form action="{{ url_for('index') }}" method="post">
           <div class="form-row" style="float: right;">
             <label class="col-form-label form-group"
-              >Signed in as <b>{{ session['user_id'] }}</b></label
+              >Signed in as <b>{{ session["username"] }}</b></label
             >
             <div class="form-group">
               <button
@@ -57,7 +58,14 @@
         {% else %}
         <!--Display login button-->
         <div class="form-row" style="float: right;">
-          <div class="form-groupr">
+          <div class="form-group">
+            <a
+            href="/register"
+            class="btn btn-outline-danger btn-sm"
+            role="button"
+            style="margin: 0.5rem auto;"
+            >Sign Up</a
+          >
             <a
               href="/login"
               class="btn btn-outline-primary btn-sm"
@@ -73,28 +81,29 @@
 
     <div class="container">
       {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for
-      category, message in messages %} {% if category == 'error' %}
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      {% elif category == 'message' %}
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      {% else %}
-      <div class="alert alert-primary alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      {% endif %} {% endfor %} {% endif %} {% endwith %} {% block body%} {% endblock %}
+        category, message in messages %} {% if category == 'error' %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% elif category == 'message' %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% else %}
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endif %} {% endfor %} {% endif %} {% endwith %}
+       {% block body%} {% endblock %}
     </div>
   </body>
 </html>

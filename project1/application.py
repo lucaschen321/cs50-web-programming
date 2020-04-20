@@ -44,16 +44,17 @@ def index():
         try:
             # Handle logouts
             if "logout" in request.form:
-                session["user_id"] = None
+                session["username"] = None
+                return redirect(request.referrer)
             else:
                 raise Exception
         except:
             return render_template("error.html")
 
-    return render_template("index.html")
+    return render_template("search.html")
 
 
-@app.route("/search", methods=["POST"])
+@app.route("/search", methods=["GET", "POST"])
 def search():
     search_text = request.form.get("search_text")
     search_type = request.form.get("search_type")
@@ -90,7 +91,7 @@ def book(book_id, title):
 
     # Make sure book exists.
     book = db.execute(
-        "SELECT * from books WHERE book_id = :book_id", {"book_id": book_id}
+        "SELECT * from books WHERE book_id = :book_id AND title = :title", {"book_id": book_id, "title": title}
     ).fetchone()
     if book is None:
         return render_template("error.html")
@@ -102,7 +103,7 @@ def book(book_id, title):
 
         if not "review_text" in request.form:
             flash("Please submit a review", "error")
-        elif not session["user_id"]:
+        elif not session["username"]:
             flash(
                 Markup(
                     'Please <a href="/login" class="alert-link">sign in</a> to submit a review'
@@ -113,7 +114,7 @@ def book(book_id, title):
             user_id = (
                 db.execute(
                     "SELECT * FROM users WHERE username = :username",
-                    {"username": session["user_id"]},
+                    {"username": session["username"]},
                 )
                 .fetchone()
                 .user_id
@@ -130,9 +131,10 @@ def book(book_id, title):
                 flash("Already submitted a review", "error")
             else:
                 db.execute(
-                    "INSERT INTO reviews (user_id, book_id, review_rating, review_text, time_created) VALUES (:user_id, :book_id, :review_rating, :review_text, :time_created)",
+                    "INSERT INTO reviews (user_id, username, book_id, review_rating, review_text, time_created) VALUES (:user_id, :username, :book_id, :review_rating, :review_text, :time_created)",
                     {
                         "user_id": user_id,
+                        "username": session["username"],
                         "book_id": book.book_id,
                         "review_rating": review_rating,
                         "review_text": review_text,
@@ -209,7 +211,7 @@ def register():
             )
             db.commit()
 
-            session["user_id"] = request.form.get("username")
+            session["username"] = request.form.get("username")
             flash("Account created!", "message")
 
             return redirect(url_for("index"))
@@ -246,7 +248,7 @@ def login():
             ):  # Invalid credentials
                 flash("Invalid credentials!", "error")
             else:  # 'Log in' user
-                session["user_id"] = request.form.get("username")
+                session["username"] = request.form.get("username")
                 flash("Logged In!", "message")
                 return redirect(url_for("index"))
 
