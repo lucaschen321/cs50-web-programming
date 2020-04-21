@@ -5,52 +5,92 @@
 {% endblock %}
 
 {% block body %}
-<h1>Book</h1>
-<ul>
-  <li>Title: {{ book.title }} </li>
-  <li>Author: {{ book.author }}</li>
-  <li>ISBN: {{ book.isbn }}</li>
-  <li>Publication Year: {{ book.publication_year }}</li>
-</ul>
-<h2>Goodreads Data</h2>
-<ul>
-  <li>Average Rating: {{ goodreads_data['average_rating'] | default("N/A") }} </li>
-  <li>Number of reviews: {{ goodreads_data['work_ratings_count'] | default("N/A") }} </li>
-</ul>
+<h1 style="text-align: center;">{{ book.title }}</h1>
 
-<form action="{{ url_for('book', book_id=book.book_id, title=book.title) }}" method="post">
+<div class="card mb-3" style=" width: 50%; margin: 2rem auto;">
+  <div class="card-header"><h5 style="margin: 0">Book Information</h5></div>
+  <div class="card-body">
+    <div style="display:inline-block;">
+      <ul style="list-style-type: none;">
+        <li><b>Author:</b></li>
+        <li><b>ISBN:</b></li>
+        <li><b>Publication Year:</b></li>
+        <li><b>Average Rating (Goodreads):</b></li>
+        <li><b>Number of Reviews (Goodreads):</b></li>
+      </ul>
+    </div>
+    <div style="display:inline-block; ">
+      <ul style="list-style-type: none;">
+        <li>{{ book.author }}</li>
+        <li>{{ book.isbn }}</li>
+        <li>{{ book.publication_year }}</li>
+        <li>{{ goodreads_data['average_rating'] | default("N/A") }} </li>
+        <li>{{ goodreads_data['work_ratings_count'] | default("N/A") }} </li>
+      </ul>
+    </div>
 
-  <h1>Submit Review:</h1>
-  <div class="form-row container">
-    <div class="form-group col-xs-1">
-      <label>Rating</label>
-      <select class="form-control" name="review_rating">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
-    </div>
-    <div class="form-group col-md-10">
-      <textarea class="form-control" name="review_text" rows="3" placeholder="Submit review for {{ book.title }}" required></textarea>
-    </div>
-    <div class="form-group col-md-1">
-      <button type="submit" name="reivew" class="btn btn-primary">Submit</button>
-    </div>
   </div>
-</form>
+</div>
 
-<h1>Reviews</h1>
+<div class="container" style="margin-bottom: 4rem; margin-top: 2rem;">
+<form id="ratingForm" action="{{ url_for('book', book_id=book.book_id, title=book.title) }}" method="post">
+  <h2>Submit Review:</h2>
+    <b>Overall Rating</b>
+    <div style="display:block; margin-bottom: 2.5rem;">
+      <fieldset class="rating">
+        <input type="radio" id="star5" name="rating" value="5"/><label for="star5"></label>
+        <input type="radio" id="star4" name="rating" value="4"/><label for="star4"></label>
+        <input type="radio" id="star3" name="rating" value="3"/><label for="star3"></label>
+        <input type="radio" id="star2" name="rating" value="2"/><label for="star2"></label>
+        <input type="radio" id="star1" name="rating" value="1"/><label for="star1"></label>
+        <div class="clearfix"></div>
+      </fieldset>
+    </div>
+    <b>Write your review</b>
+      <textarea class="form-control" name="review_text" rows="3" style="min-height: 2.5rem; width: 100%;" placeholder="Submit review for {{ book.title }}" required></textarea>
+      <span style="float:right; margin-top: 1rem;">
+      <button type="submit" name="review" class="btn btn-primary">Submit</button>
+      </span>
+</form>
+</div>
+
+<div class="container">
+{% if reviews %}
+<h2>Reviews</h2>
+{{ reviews|length }} reviews for: <b>{{ book.title }}</b>
+<br>
+<br>
   {% for review in reviews%}
-    <h3>Author: {{ review.user_id }}</h3>
-    <ul>
-      <li>Rating: {{ review.review_rating }}</li>
-      <li>Review: {{ review.review_text }}</li>
-    </ul>
-  {% else %}
-    <h2>No reviews</h2>
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-header">
+        <!--Display review rating as stars-->
+        {% for i in range(review.review_rating) %}
+          <span class="fa fa-star checked"></span>
+        {% endfor %}
+        {% for i in range(5 - review.review_rating) %}
+          <span class="fa fa-star not-checked"></span>
+        {% endfor %}
+        <br>
+        
+
+        <p style="text-align:left; margin: 0;" >
+          <b>{{ review.username }}</b>
+          <span style="float:right;">
+            {{ review.time_created.strftime('%B %d, %Y') }}
+          </span>
+      </p>
+        
+      </div>
+      <div class="card-body">
+        {{ review.review_text }}
+      </div>
+    </div>
   {% endfor %}
+{% else %}
+<h3>No reviews</h3>
+{% endif %}
+</div>
+
 
 
 {% endblock %}
