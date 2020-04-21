@@ -1,11 +1,21 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Error
+    Error 404
 {% endblock %}
 
 {% block body %}
-    <h1>Error</h1>
+    <div class="container">
+        <div class="row" style="display: flex; justify-content: center;">
+            <img src="../static/logo-mini.png" alt="" style="width: 9%; height: 9%; min-width: 75px; float:left;">
+            <div style="padding: 2% 1rem">
+                <h4><b>Error 404: Page not found</b></h4>
+                {% if error_message %}
+                    <pre><mark>{{ error_message }}</mark></pre>
+                {% endif %} 
+            </div>
+        </div>
+    </div>
 
     {{ message }}
 {% endblock %}

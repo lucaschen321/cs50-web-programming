@@ -48,8 +48,8 @@ def index():
                 return redirect(request.referrer)
             else:
                 raise Exception
-        except:
-            return render_template("error.html")
+        except Exception as e:
+            return render_template("error.html", error_message=str(e)), 404
 
     return render_template("index.html")
 
@@ -77,8 +77,8 @@ def search():
             # Still redirect to search page if search_type or search_text is empty
             search_type = "" if not search_type else search_type
             search_text = "" if not search_text else search_text
-    except:
-        return render_template("error.html"), 404
+    except Exception as e:
+        return render_template("error.html", error_message=str(e)), 404
 
     return render_template(
         "search.html",
@@ -90,14 +90,17 @@ def search():
 
 @app.route("/book/<int:book_id>-<string:title>", methods=["GET", "POST"])
 def book(book_id, title):
-    """List details about a single book and accept review submissions."""
+    """
+    GET: List details and reviews for a single book.
+    POST: Accept review submissions.
+    """
 
     # Make sure book exists.
     book = db.execute(
         "SELECT * from books WHERE book_id = :book_id AND title = :title", {"book_id": book_id, "title": title}
     ).fetchone()
     if book is None:
-        return render_template("error.html")
+        return render_template("error.html", error_message=f"Book with id '{book_id}' and title '{title}' not found."), 404
 
     # Submit review if posted
     if request.method == "POST":
