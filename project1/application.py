@@ -107,9 +107,11 @@ def book(book_id, title):
         review_text = request.form.get("review_text")
         review_rating = request.form.get("review_rating")
 
-        if not "review_text" in request.form:
-            flash("Please submit a review", "error")
-        elif not session["username"]:
+        if not review_text or not review_rating:
+            flash("Please write a review before submitting!", "error")
+        elif not review_rating :
+            flash("Please enter a rating before submitting!", "error")
+        elif not session.get("username"):
             flash(
                 Markup(
                     'Please <a href="/login" class="alert-link">sign in</a> to submit a review'
