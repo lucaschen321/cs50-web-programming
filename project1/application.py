@@ -114,7 +114,7 @@ def book(book_id, title):
         review_text = request.form.get("review_text")
         review_rating = request.form.get("review_rating")
 
-        if not review_text or not review_rating:
+        if not review_text:
             flash("Please write a review before submitting!", "error")
         elif not review_rating:
             flash("Please enter a rating before submitting!", "error")
