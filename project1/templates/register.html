@@ -1,32 +1,39 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Register
+  Sign Up
 {% endblock %}
 
 {% block body %}
-    <h1>Registration</h1>
+  <h1>Registration</h1>
 
-    <form action="{{ url_for('register') }}" method="post">
-
-        <div class="form-group">
-            <label>Username:</label>
-            <input class="form-control" name="username" placeholder="Enter username" required>
-        </div>
-
-        <div class="form-group">
-            <label>Password:</label>
-            <input type="password" class="form-control" name="password" placeholder="Enter password" required>
-        </div>
-
-        <div class="form-group">
-            <label>Confirm Password:</label>
-            <input type="password" class="form-control" name="password_confirmation" placeholder="Reenter password" required>
-        </div>
-
-        <div class="form-group">
-            <button class="btn btn-primary">Sign Up</button>
-        </div>
-
-    </form>
+  <form action="{{ url_for('register') }}" method="post">
+    <div class="form-group">
+      <label>Username:</label>
+      <input class="form-control" name="username" placeholder="Enter username" required />
+    </div>
+    <div class="form-group">
+      <label>Password:</label>
+      <input
+        type="password"
+        class="form-control"
+        name="password"
+        placeholder="Enter password"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label>Confirm Password:</label>
+      <input
+        type="password"
+        class="form-control"
+        name="password_confirmation"
+        placeholder="Reenter password"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary">Sign Up</button>
+    </div>
+  </form>
 {% endblock %}

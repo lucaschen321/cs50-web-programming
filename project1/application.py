@@ -97,10 +97,17 @@ def book(book_id, title):
 
     # Make sure book exists.
     book = db.execute(
-        "SELECT * from books WHERE book_id = :book_id AND title = :title", {"book_id": book_id, "title": title}
+        "SELECT * from books WHERE book_id = :book_id AND title = :title",
+        {"book_id": book_id, "title": title},
     ).fetchone()
     if book is None:
-        return render_template("error.html", error_message=f"Book with id '{book_id}' and title '{title}' not found."), 404
+        return (
+            render_template(
+                "error.html",
+                error_message=f"Book with id '{book_id}' and title '{title}' not found.",
+            ),
+            404,
+        )
 
     # Submit review if posted
     if request.method == "POST":
@@ -109,7 +116,7 @@ def book(book_id, title):
 
         if not review_text or not review_rating:
             flash("Please write a review before submitting!", "error")
-        elif not review_rating :
+        elif not review_rating:
             flash("Please enter a rating before submitting!", "error")
         elif not session.get("username"):
             flash(
