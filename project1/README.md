@@ -35,6 +35,7 @@
 
 ## Project Structure
 
+```markdown
 .
 ├── GOODREADS_API_KEY
 ├── README.md
@@ -56,6 +57,7 @@
 │   ├── register.html
 │   └── search.html
 └── test.py
+```
 
 - **GOODREADS_API_KEY**: Store API key for Goodreads
 - **application.py**: Main flask web application
